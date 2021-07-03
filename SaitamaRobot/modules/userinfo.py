@@ -241,8 +241,8 @@ def info(update: Update, context: CallbackContext):
     rep = message.reply_text("<code>Collecting User Information.....</code>", parse_mode=ParseMode.HTML)
 
     text = (
-        f"╒═══「<b> Appraisal results:</b> 」\n"
-        f"ID: <code>{user.id}</code>\n"
+        f"╒═══「<b> Apprs:< 」\n"
+        f"ID Number: <code>{user.id}</code>\n"
         f"First Name: {html.escape(user.first_name)}"
     )
 
@@ -252,7 +252,7 @@ def info(update: Update, context: CallbackContext):
     if user.username:
         text += f"\nUsername: @{html.escape(user.username)}"
 
-    text += f"\nPermalink: {mention_html(user.id, 'link')}"
+    text += f"\nPermanent Link: {mention_html(user.id, 'Here')}"
 
     if chat.type != "private" and user_id != bot.id:
         _stext = "\nPresence: <code>{}</code>"
