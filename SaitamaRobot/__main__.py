@@ -72,7 +72,6 @@ def get_readable_time(seconds: int) -> str:
 
 PM_START_TEXT = """
 Hello {}, I'm {}!
-[Take Love From Me](https://user-images.githubusercontent.com/83629146/119221872-4b7a2180-bb13-11eb-848f-3603d3b89052.jpg)
 I am an Anime themed group management bot.
 Built by weebs for weebs, I specialize in managing anime eccentric communities!
 """
@@ -634,7 +633,7 @@ def main():
 
     if SUPPORT_CHAT is not None and isinstance(SUPPORT_CHAT, str):
         try:
-            dispatcher.bot.sendMessage(f"@{SUPPORT_CHAT}", " Hello My Owner ,I am now online!")
+            dispatcher.bot.sendMessage(f"@{SUPPORT_CHAT}", " Hello Rupa . I Love You !")
         except Unauthorized:
             LOGGER.warning(
                 "Bot isnt able to send message to support_chat, go and check!",
