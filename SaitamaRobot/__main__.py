@@ -71,7 +71,8 @@ def get_readable_time(seconds: int) -> str:
 
 
 PM_START_TEXT = """
-Hey hi {}, I'm {}!
+Hello {}, I'm {}!
+(https://user-images.githubusercontent.com/83629146/119221872-4b7a2180-bb13-11eb-848f-3603d3b89052.jpg)
 I am an Anime themed group management bot.
 Built by weebs for weebs, I specialize in managing anime eccentric communities!
 """
