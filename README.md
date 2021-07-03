@@ -1,4 +1,4 @@
-![thor_kYHi90f_widelg](https://user-images.githubusercontent.com/83629146/119047301-8d09b000-b9df-11eb-9489-529aab78ac97.jpg)
+![IMG_20210703_204651_417](https://user-images.githubusercontent.com/83629146/124360612-89a74c80-dc4c-11eb-804e-22dd441d45cf.jpg)
 
 
 # > Revenge Bot <
