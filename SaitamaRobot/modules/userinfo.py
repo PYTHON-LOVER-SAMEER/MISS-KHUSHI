@@ -512,6 +512,7 @@ def __user_info__(user_id):
         result += f"<b>About user:</b>\n{me}\n"
     if bio:
         result += f"<b>What others say:</b>\n{bio}\n"
+        result += f"<b> Have a good day</b>\n"
     result = result.strip("\n")
     return result
 
