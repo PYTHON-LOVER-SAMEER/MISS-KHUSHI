@@ -219,7 +219,7 @@ def start(update: Update, context: CallbackContext):
                     [
                         [
                             InlineKeyboardButton(
-                                text="☑️ Add me",
+                                text="☑️ Add me in your group",
                                 url="t.me/{}?startgroup=true".format(
                                     context.bot.username,
                                 ),
@@ -227,27 +227,27 @@ def start(update: Update, context: CallbackContext):
                         ],
                         [
                             InlineKeyboardButton(
-                                text="🚑 Support",
+                                text="🚑 Support Group",
                                 url=f"https://t.me/{SUPPORT_CHAT}",
                             ),
                             InlineKeyboardButton(
-                                text="🔔 Updates",
+                                text="🔔 Updates ",
                                 url="https://t.me/Thunder_Bot_Support",
                             ),
                         ],
                         [
                             InlineKeyboardButton(
                                 text="🧾 Getting Started",
-                                url="https://t.me/Thunder_Bot_Support",
+                                url="https://github.com/AL-Noman21/Revenge_Bot",
                             ),
                             InlineKeyboardButton(
-                                text="🗄 Source code",
+                                text="🗄 Source Code",
                                 url="https://github.com/AL-Noman21/Revenge_Bot",
                             ),
                         ],
                         [
                             InlineKeyboardButton(
-                                text="☠️ Kaizoku Network",
+                                text="☠️ Our Network",
                                 url="https://t.me/Thunder_Bot_Support",
                             ),
                         ],
