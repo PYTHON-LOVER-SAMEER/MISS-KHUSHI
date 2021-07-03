@@ -1,7 +1,7 @@
 ![thor_kYHi90f_widelg](https://user-images.githubusercontent.com/83629146/119047301-8d09b000-b9df-11eb-9489-529aab78ac97.jpg)
 
 
-# >> Revenge Bot <<
+# > Revenge Bot <
 
 A modular Telegram Python bot running on python3 with a sqlalchemy database.
 
