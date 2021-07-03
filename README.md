@@ -5,7 +5,7 @@
 
 A modular Telegram Python bot running on python3 with a sqlalchemy database.
 
-Originally a SaitamaRobot fork, Thunder Bot evolved further and was built to be more robust. 
+Originally a SaitamaRobot fork, Revenge Bot evolved further and was built to be more robust. 
 
 In support group you can ask for help, discover/request new features, report bugs, and stay in the loop whenever a new update is available. 
 
