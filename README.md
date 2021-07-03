@@ -1,7 +1,7 @@
 ![thor_kYHi90f_widelg](https://user-images.githubusercontent.com/83629146/119047301-8d09b000-b9df-11eb-9489-529aab78ac97.jpg)
 
 
-# Thunder Bot 
+# >>>> Revenge Bot <<<<
 
 A modular Telegram Python bot running on python3 with a sqlalchemy database.
 
@@ -12,7 +12,7 @@ In support group you can ask for help, discover/request new features, report bug
 
 ## How to setup/deploy.
 
-[![Deploy To Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/AL-Noman21/Thunder_Bot)
+[![Deploy To Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/AL-Noman21/Revenge_Bot)
 
 ### Read these notes carefully before proceeding 
 
