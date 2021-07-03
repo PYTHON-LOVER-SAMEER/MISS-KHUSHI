@@ -252,7 +252,7 @@ def info(update: Update, context: CallbackContext):
     if user.username:
         text += f"\nUsername : @{html.escape(user.username)}"
 
-    text += f"\nPermanent Link : {mention_html(user.id, 'link')}"
+    text += f"\nPermanent Link : {mention_html(user.id, 'This')}"
 
     if chat.type != "private" and user_id != bot.id:
         _stext = "\nPresence: <code>{}</code>"
