@@ -97,7 +97,7 @@ And the following:
     "" if not ALLOW_EXCL else "\nAll commands can either be used with / or !.\n",
 )
 
-SAITAMA_IMG = "![IMG_20210703_204651_417](https://user-images.githubusercontent.com/83629146/124360612-89a74c80-dc4c-11eb-804e-22dd441d45cf.jpg)"
+SAITAMA_IMG = "(https://user-images.githubusercontent.com/83629146/124360612-89a74c80-dc4c-11eb-804e-22dd441d45cf.jpg)"
 
 DONATE_STRING = """Heya, glad to hear you want to donate!
  You can support the project via [Paypal](ko-fi.com/sawada) or by contacting @Sawada \
@@ -232,23 +232,23 @@ def start(update: Update, context: CallbackContext):
                             ),
                             InlineKeyboardButton(
                                 text="🔔 Updates",
-                                url="https://t.me/OnePunchUpdates",
+                                url="https://t.me/Thunder_Bot_Support",
                             ),
                         ],
                         [
                             InlineKeyboardButton(
                                 text="🧾 Getting Started",
-                                url="https://t.me/OnePunchUpdates/29",
+                                url="https://t.me/Thunder_Bot_Support",
                             ),
                             InlineKeyboardButton(
                                 text="🗄 Source code",
-                                url="https://github.com/AnimeKaizoku/SaitamaRobot",
+                                url="https://github.com/AL-Noman21/Revenge_Bot",
                             ),
                         ],
                         [
                             InlineKeyboardButton(
                                 text="☠️ Kaizoku Network",
-                                url="https://t.me/Kaizoku/4",
+                                url="https://t.me/Thunder_Bot_Support",
                             ),
                         ],
                     ],
@@ -633,7 +633,7 @@ def main():
 
     if SUPPORT_CHAT is not None and isinstance(SUPPORT_CHAT, str):
         try:
-            dispatcher.bot.sendMessage(f"@{SUPPORT_CHAT}", "I am now online!")
+            dispatcher.bot.sendMessage(f"@{SUPPORT_CHAT}", " Hello My Owner ,I am now online!")
         except Unauthorized:
             LOGGER.warning(
                 "Bot isnt able to send message to support_chat, go and check!",
