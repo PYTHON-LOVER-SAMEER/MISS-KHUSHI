@@ -241,7 +241,7 @@ def info(update: Update, context: CallbackContext):
     rep = message.reply_text("<code>Appraising...</code>", parse_mode=ParseMode.HTML)
 
     text = (
-        f"<b> Full Information :</b> \n"
+        f"<b> Full Information of {html.escape(user.first_name)} :</b> \n"
         f"ID Number : <code>{user.id}</code>\n"
         f"First Name : {html.escape(user.first_name)}"
     )
