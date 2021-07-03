@@ -252,7 +252,7 @@ def info(update: Update, context: CallbackContext):
     if user.username:
         text += f"\nUsername : @{html.escape(user.username)}"
 
-    text += f"\nPermalink : {mention_html(user.id, 'link')}"
+    text += f"\nPermanent Link : {mention_html(user.id, 'link')}"
 
     if chat.type != "private" and user_id != bot.id:
         _stext = "\nPresence: <code>{}</code>"
@@ -287,7 +287,7 @@ def info(update: Update, context: CallbackContext):
     disaster_level_present = False
 
     if user.id == OWNER_ID:
-        text += "\n\nThe Disaster level of this person is 'God'."
+        text += "\n\nThe Disaster level of this person is 'Owner'."
         disaster_level_present = True
     elif user.id in DEV_USERS:
         text += "\n\nThis user is member of 'Hero Association'."
