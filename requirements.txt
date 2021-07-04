@@ -1,5 +1,4 @@
 html2text
-bing_image_downloader
 aiohttp>=2.2.5
 alphabet_detector
 beautifulsoup4
@@ -35,3 +34,4 @@ telethon
 ujson
 wikipedia
 zalgo-text
+bing_image_downloader
