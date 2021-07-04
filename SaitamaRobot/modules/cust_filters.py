@@ -3,9 +3,10 @@ import random
 from html import escape
 
 import telegram
-from telegram import ParseMode, InlineKeyboardMarkup, Message, InlineKeyboardButton
+from telegram import ParseMode, InlineKeyboardMarkup, Message, InlineKeyboardButton, Update
 from telegram.error import BadRequest
 from telegram.ext import (
+    CallbackContext,
     CommandHandler,
     MessageHandler,
     DispatcherHandlerStop,
@@ -15,13 +16,13 @@ from telegram.ext import (
 )
 from telegram.utils.helpers import mention_html, escape_markdown
 
-from SaitamaRobot import dispatcher, LOGGER, DRAGONS
+from SaitamaRobot import dispatcher, LOGGER, SUDO_USERS
 from SaitamaRobot.modules.disable import DisableAbleCommandHandler
 from SaitamaRobot.modules.helper_funcs.handlers import MessageHandlerChecker
 from SaitamaRobot.modules.helper_funcs.chat_status import user_admin
 from SaitamaRobot.modules.helper_funcs.extraction import extract_text
 from SaitamaRobot.modules.helper_funcs.filters import CustomFilters
-from SaitamaRobot.modules.helper_funcs.misc import build_keyboard_parser
+from SaitamaRobot.modules.helper_funcs.misc import build_keyboard_parser, delete
 from SaitamaRobot.modules.helper_funcs.msg_types import get_filter_type
 from SaitamaRobot.modules.helper_funcs.string_handling import (
     split_quotes,
@@ -29,6 +30,7 @@ from SaitamaRobot.modules.helper_funcs.string_handling import (
     escape_invalid_curly_brackets,
     markdown_to_html,
 )
+from SaitamaRobot.modules.sql.clear_cmd_sql import get_clearcmd
 from SaitamaRobot.modules.sql import cust_filters_sql as sql
 
 from SaitamaRobot.modules.connection import connected
@@ -50,9 +52,8 @@ ENUM_FUNC_MAP = {
 }
 
 
-@run_async
 @typing_action
-def list_handlers(update, context):
+def list_handlers(update: Update, context: CallbackContext):
     chat = update.effective_chat
     user = update.effective_user
 
@@ -74,38 +75,38 @@ def list_handlers(update, context):
 
     if not all_handlers:
         send_message(
-            update.effective_message, "No filters saved in {}!".format(chat_name),
+            update.effective_message, "No filters saved in {}!".format(chat_name)
         )
         return
 
     for keyword in all_handlers:
         entry = " • `{}`\n".format(escape_markdown(keyword))
         if len(entry) + len(filter_list) > telegram.MAX_MESSAGE_LENGTH:
-            send_message(
+            deletion(update, context, send_message(
                 update.effective_message,
                 filter_list.format(chat_name),
                 parse_mode=telegram.ParseMode.MARKDOWN,
-            )
+            ))
             filter_list = entry
         else:
             filter_list += entry
 
-    send_message(
+    deletion(update, context, send_message(
         update.effective_message,
         filter_list.format(chat_name),
         parse_mode=telegram.ParseMode.MARKDOWN,
-    )
+    ))
 
 
 # NOT ASYNC BECAUSE DISPATCHER HANDLER RAISED
 @user_admin
 @typing_action
-def filters(update, context):
+def filters(update: Update, context: CallbackContext):
     chat = update.effective_chat
     user = update.effective_user
     msg = update.effective_message
     args = msg.text.split(
-        None, 1,
+        None, 1
     )  # use python's maxsplit to separate Cmd, keyword, and reply_text
 
     conn = connected(context.bot, update, chat, user.id)
@@ -151,10 +152,10 @@ def filters(update, context):
     text, file_type, file_id = get_filter_type(msg)
     if not msg.reply_to_message and len(extracted) >= 2:
         offset = len(extracted[1]) - len(
-            msg.text,
+            msg.text
         )  # set correct offset relative to command + notename
         text, buttons = button_markdown_parser(
-            extracted[1], entities=msg.parse_entities(), offset=offset,
+            extracted[1], entities=msg.parse_entities(), offset=offset
         )
         text = text.strip()
         if not text:
@@ -172,10 +173,10 @@ def filters(update, context):
         else:
             text_to_parsing = ""
         offset = len(
-            text_to_parsing,
+            text_to_parsing
         )  # set correct offset relative to command + notename
         text, buttons = button_markdown_parser(
-            text_to_parsing, entities=msg.parse_entities(), offset=offset,
+            text_to_parsing, entities=msg.parse_entities(), offset=offset
         )
         text = text.strip()
 
@@ -194,10 +195,10 @@ def filters(update, context):
         else:
             text_to_parsing = ""
         offset = len(
-            text_to_parsing,
+            text_to_parsing
         )  # set correct offset relative to command + notename
         text, buttons = button_markdown_parser(
-            text_to_parsing, entities=msg.parse_entities(), offset=offset,
+            text_to_parsing, entities=msg.parse_entities(), offset=offset
         )
         text = text.strip()
         if (msg.reply_to_message.text or msg.reply_to_message.caption) and not text:
@@ -216,18 +217,18 @@ def filters(update, context):
     # sql.add_filter(chat_id, keyword, content, is_sticker, is_document, is_image, is_audio, is_voice, is_video, buttons)
 
     if add is True:
-        send_message(
+        deletion(update, context, send_message(
             update.effective_message,
             "Saved filter '{}' in *{}*!".format(keyword, chat_name),
             parse_mode=telegram.ParseMode.MARKDOWN,
-        )
+        ))
     raise DispatcherHandlerStop
 
 
 # NOT ASYNC BECAUSE DISPATCHER HANDLER RAISED
 @user_admin
 @typing_action
-def stop_filter(update, context):
+def stop_filter(update: Update, context: CallbackContext):
     chat = update.effective_chat
     user = update.effective_user
     args = update.effective_message.text.split(None, 1)
@@ -256,21 +257,20 @@ def stop_filter(update, context):
     for keyword in chat_filters:
         if keyword == args[1]:
             sql.remove_filter(chat_id, args[1])
-            send_message(
+            deletion(update, context, send_message(
                 update.effective_message,
                 "Okay, I'll stop replying to that filter in *{}*.".format(chat_name),
                 parse_mode=telegram.ParseMode.MARKDOWN,
-            )
+            ))
             raise DispatcherHandlerStop
 
-    send_message(
+    deletion(update, context, send_message(
         update.effective_message,
         "That's not a filter - Click: /filters to get currently active filters.",
-    )
+    ))
 
 
-@run_async
-def reply_filter(update, context):
+def reply_filter(update: Update, context: CallbackContext):
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
 
@@ -313,11 +313,11 @@ def reply_filter(update, context):
                     if text.startswith("~!") and text.endswith("!~"):
                         sticker_id = text.replace("~!", "").replace("!~", "")
                         try:
-                            context.bot.send_sticker(
+                            deletion(update, context, context.bot.send_sticker(
                                 chat.id,
                                 sticker_id,
                                 reply_to_message_id=message.message_id,
-                            )
+                            ))
                             return
                         except BadRequest as excp:
                             if (
@@ -333,14 +333,14 @@ def reply_filter(update, context):
                                 LOGGER.exception("Error in filters: " + excp.message)
                                 return
                     valid_format = escape_invalid_curly_brackets(
-                        text, VALID_WELCOME_FORMATTERS,
+                        text, VALID_WELCOME_FORMATTERS
                     )
                     if valid_format:
                         filtext = valid_format.format(
                             first=escape(message.from_user.first_name),
                             last=escape(
                                 message.from_user.last_name
-                                or message.from_user.first_name,
+                                or message.from_user.first_name
                             ),
                             fullname=" ".join(
                                 [
@@ -348,15 +348,15 @@ def reply_filter(update, context):
                                     escape(message.from_user.last_name),
                                 ]
                                 if message.from_user.last_name
-                                else [escape(message.from_user.first_name)],
+                                else [escape(message.from_user.first_name)]
                             ),
                             username="@" + escape(message.from_user.username)
                             if message.from_user.username
                             else mention_html(
-                                message.from_user.id, message.from_user.first_name,
+                                message.from_user.id, message.from_user.first_name
                             ),
                             mention=mention_html(
-                                message.from_user.id, message.from_user.first_name,
+                                message.from_user.id, message.from_user.first_name
                             ),
                             chatname=escape(message.chat.title)
                             if message.chat.type != "private"
@@ -370,13 +370,13 @@ def reply_filter(update, context):
 
                 if filt.file_type in (sql.Types.BUTTON_TEXT, sql.Types.TEXT):
                     try:
-                        context.bot.send_message(
+                        deletion(update, context, context.bot.send_message(
                             chat.id,
                             markdown_to_html(filtext),
                             parse_mode=ParseMode.HTML,
                             disable_web_page_preview=True,
                             reply_markup=keyboard
-                        )
+                        ))
                     except BadRequest as excp:
                         LOGGER.exception("Error in filters: " + excp.message)
                         try:
@@ -420,13 +420,13 @@ def reply_filter(update, context):
                     keyboard = InlineKeyboardMarkup(keyb)
 
                     try:
-                        context.bot.send_message(
+                        deletion(update, context, context.bot.send_message(
                             chat.id,
                             filt.reply,
                             parse_mode=ParseMode.MARKDOWN,
                             disable_web_page_preview=True,
                             reply_markup=keyboard,
-                        )
+                        ))
                     except BadRequest as excp:
                         if excp.message == "Unsupported url protocol":
                             try:
@@ -447,7 +447,7 @@ def reply_filter(update, context):
                             except BadRequest as excp:
                                 LOGGER.exception("Error in filters: " + excp.message)
                             LOGGER.warning(
-                                "Message %s could not be parsed", str(filt.reply),
+                                "Message %s could not be parsed", str(filt.reply)
                             )
                             LOGGER.exception(
                                 "Could not parse filter %s in chat %s",
@@ -458,31 +458,32 @@ def reply_filter(update, context):
                 else:
                     # LEGACY - all new filters will have has_markdown set to True.
                     try:
-                        context.bot.send_message(chat.id, filt.reply)
+                        deletion(update, context, context.bot.send_message(
+                        	chat.id, filt.reply
+                        ))
                     except BadRequest as excp:
                         LOGGER.exception("Error in filters: " + excp.message)
                 break
 
 
-@run_async
-def rmall_filters(update, context):
+def rmall_filters(update: Update, context: CallbackContext):
     chat = update.effective_chat
     user = update.effective_user
     member = chat.get_member(user.id)
-    if member.status != "creator" and user.id not in DRAGONS:
+    if member.status != "creator" and user.id not in SUDO_USERS:
         update.effective_message.reply_text(
-            "Only the chat owner can clear all notes at once.",
+            "Only the chat owner can clear all notes at once."
         )
     else:
         buttons = InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton(
-                        text="Stop all filters", callback_data="filters_rmall",
-                    ),
+                        text="Stop all filters", callback_data="filters_rmall"
+                    )
                 ],
                 [InlineKeyboardButton(text="Cancel", callback_data="filters_cancel")],
-            ],
+            ]
         )
         update.effective_message.reply_text(
             f"Are you sure you would like to stop ALL filters in {chat.title}? This action cannot be undone.",
@@ -491,14 +492,13 @@ def rmall_filters(update, context):
         )
 
 
-@run_async
-def rmall_callback(update, context):
+def rmall_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     chat = update.effective_chat
     msg = update.effective_message
     member = chat.get_member(query.from_user.id)
     if query.data == "filters_rmall":
-        if member.status == "creator" or query.from_user.id in DRAGONS:
+        if member.status == "creator" or query.from_user.id in SUDO_USERS:
             allfilters = sql.get_chat_triggers(chat.id)
             if not allfilters:
                 msg.edit_text("No filters in this chat, nothing to stop!")
@@ -521,13 +521,21 @@ def rmall_callback(update, context):
         if member.status == "member":
             query.answer("You need to be admin to do this.")
     elif query.data == "filters_cancel":
-        if member.status == "creator" or query.from_user.id in DRAGONS:
+        if member.status == "creator" or query.from_user.id in SUDO_USERS:
             msg.edit_text("Clearing of all filters has been cancelled.")
             return
         if member.status == "administrator":
             query.answer("Only owner of the chat can do this.")
         if member.status == "member":
             query.answer("You need to be admin to do this.")
+
+
+def deletion(update: Update, context: CallbackContext, delmsg):
+    chat = update.effective_chat
+    cleartime = get_clearcmd(chat.id, "filters")
+
+    if cleartime:
+        context.dispatcher.run_async(delete, delmsg, cleartime.time)
 
 
 # NOT ASYNC NOT A HANDLER
@@ -539,7 +547,7 @@ def get_exception(excp, filt, chat):
     else:
         LOGGER.warning("Message %s could not be parsed", str(filt.reply))
         LOGGER.exception(
-            "Could not parse filter %s in chat %s", str(filt.keyword), str(chat.id),
+            "Could not parse filter %s in chat %s", str(filt.keyword), str(chat.id)
         )
         return "This data could not be sent because it is incorrectly formatted."
 
@@ -585,7 +593,7 @@ is mentioned. If you reply to a sticker with a keyword, the bot will reply with 
 keywords are in lowercase. If you want your keyword to be a sentence, use quotes. eg: /filter "hey there" How you \
 doin?
  Separate diff replies by `%%%` to get random replies
- *Example:*
+ *Example:* 
  `/filter "filtername"
  Reply 1
  %%%
@@ -607,12 +615,12 @@ __mod_name__ = "Filters"
 FILTER_HANDLER = CommandHandler("filter", filters)
 STOP_HANDLER = CommandHandler("stop", stop_filter)
 RMALLFILTER_HANDLER = CommandHandler(
-    "removeallfilters", rmall_filters, filters=Filters.group,
+    "removeallfilters", rmall_filters, filters=Filters.chat_type.groups, run_async=True
 )
-RMALLFILTER_CALLBACK = CallbackQueryHandler(rmall_callback, pattern=r"filters_.*")
-LIST_HANDLER = DisableAbleCommandHandler("filters", list_handlers, admin_ok=True)
+RMALLFILTER_CALLBACK = CallbackQueryHandler(rmall_callback, pattern=r"filters_.*", run_async=True)
+LIST_HANDLER = DisableAbleCommandHandler("filters", list_handlers, admin_ok=True, run_async=True)
 CUST_FILTER_HANDLER = MessageHandler(
-    CustomFilters.has_text & ~Filters.update.edited_message, reply_filter,
+    CustomFilters.has_text & ~Filters.update.edited_message, reply_filter, run_async=True
 )
 
 dispatcher.add_handler(FILTER_HANDLER)
