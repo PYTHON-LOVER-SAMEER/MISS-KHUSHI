@@ -1,6 +1,5 @@
 from SaitamaRobot import DEV_USERS
 from telegram import Message
-from telegram.ext import MessageFilter
 
 
 class CustomFilters(object):
