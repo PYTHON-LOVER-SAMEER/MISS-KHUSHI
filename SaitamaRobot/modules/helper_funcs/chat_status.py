@@ -7,7 +7,6 @@ from SaitamaRobot import (
     OWNER_ID,
     DEV_USERS,
     SUPPORT_CHAT,
-    WHITELIST_USERS,
     dispatcher,
 )
 
