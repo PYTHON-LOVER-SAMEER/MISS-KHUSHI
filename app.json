@@ -40,11 +40,6 @@
          "description": "Get API_HASH from my.telegram.org, used for telethon based modules.",
          "required": true,
          "value": ""
-      },
-      "HEROKU_APP_NAME": {
-         "description": "Your app name that's you already wrote on App-name form",
-         "required": true,
-         "value": ""
       },      
       "OWNER_ID": {
          "description": "Your telegram id number.",
