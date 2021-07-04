@@ -1,4 +1,5 @@
 html2text
+bing_image_downloader
 aiohttp>=2.2.5
 alphabet_detector
 beautifulsoup4
