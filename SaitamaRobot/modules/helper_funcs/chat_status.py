@@ -6,7 +6,6 @@ from SaitamaRobot import (
     DEL_CMDS,
     OWNER_ID,
     DEV_USERS,
-    SUDO_USERS,
     SUPPORT_CHAT,
     SUPPORT_USERS,
     WHITELIST_USERS,
