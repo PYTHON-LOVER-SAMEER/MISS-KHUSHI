@@ -16,7 +16,7 @@ from telegram.ext import (
 )
 from telegram.utils.helpers import mention_html, escape_markdown
 
-from SaitamaRobot import dispatcher, LOGGER, SUDO_USERS
+from SaitamaRobot import dispatcher, LOGGER
 from SaitamaRobot.modules.disable import DisableAbleCommandHandler
 from SaitamaRobot.modules.helper_funcs.handlers import MessageHandlerChecker
 from SaitamaRobot.modules.helper_funcs.chat_status import user_admin
