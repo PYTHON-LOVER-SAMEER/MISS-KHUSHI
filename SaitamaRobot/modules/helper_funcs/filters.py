@@ -2,7 +2,6 @@ from SaitamaRobot import DEV_USERS, SUDO_USERS, SUPPORT_USERS
 from telegram import Message
 from telegram.ext import MessageFilter
 
-    class _Supporters(MessageFilter):
         def filter(self, message: Message):
             return bool(message.from_user and message.from_user.id in SUPPORT_USERS)
 
