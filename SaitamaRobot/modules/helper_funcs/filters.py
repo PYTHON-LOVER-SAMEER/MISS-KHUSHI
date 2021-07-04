@@ -2,7 +2,6 @@ from SaitamaRobot import DEV_USERS
 from telegram import Message
 
 
-class CustomFilters(object):
     class _Supporters(MessageFilter):
         def filter(self, message: Message):
             return bool(message.from_user and message.from_user.id in SUPPORT_USERS)
