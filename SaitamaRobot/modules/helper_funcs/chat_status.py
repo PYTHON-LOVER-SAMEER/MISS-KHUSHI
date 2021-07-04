@@ -4,12 +4,12 @@ from cachetools import TTLCache
 from threading import RLock
 from SaitamaRobot import (
     DEL_CMDS,
+    OWNER_ID,
     DEV_USERS,
-    DRAGONS,
+    SUDO_USERS,
     SUPPORT_CHAT,
-    DEMONS,
-    TIGERS,
-    WOLVES,
+    SUPPORT_USERS,
+    WHITELIST_USERS,
     dispatcher,
 )
 
@@ -22,21 +22,21 @@ THREAD_LOCK = RLock()
 
 
 def is_whitelist_plus(chat: Chat, user_id: int, member: ChatMember = None) -> bool:
-    return any(user_id in user for user in [WOLVES, TIGERS, DEMONS, DRAGONS, DEV_USERS])
+    return any(user_id in user for user in [WHITELIST_USERS, SUPPORT_USERS, SUDO_USERS, DEV_USERS])
 
 
 def is_support_plus(chat: Chat, user_id: int, member: ChatMember = None) -> bool:
-    return user_id in DEMONS or user_id in DRAGONS or user_id in DEV_USERS
+    return user_id in SUPPORT_USERS or user_id in SUDO_USERS or user_id in DEV_USERS
 
 
 def is_sudo_plus(chat: Chat, user_id: int, member: ChatMember = None) -> bool:
-    return user_id in DRAGONS or user_id in DEV_USERS
+    return user_id in SUDO_USERS or user_id in DEV_USERS
 
 
 def is_user_admin(chat: Chat, user_id: int, member: ChatMember = None) -> bool:
     if (
         chat.type == "private"
-        or user_id in DRAGONS
+        or user_id in SUDO_USERS
         or user_id in DEV_USERS
         or chat.all_members_are_administrators
         or user_id in [777000, 1087968824]
@@ -77,10 +77,9 @@ def can_delete(chat: Chat, bot_id: int) -> bool:
 def is_user_ban_protected(chat: Chat, user_id: int, member: ChatMember = None) -> bool:
     if (
         chat.type == "private"
-        or user_id in DRAGONS
+        or user_id in SUDO_USERS
         or user_id in DEV_USERS
-        or user_id in WOLVES
-        or user_id in TIGERS
+        or user_id in WHITELIST_USERS
         or chat.all_members_are_administrators
         or user_id in [777000, 1087968824]
     ):  # Count telegram and Group Anonymous as admin
@@ -95,6 +94,30 @@ def is_user_ban_protected(chat: Chat, user_id: int, member: ChatMember = None) -
 def is_user_in_chat(chat: Chat, user_id: int) -> bool:
     member = chat.get_member(user_id)
     return member.status not in ("left", "kicked")
+
+
+def owner_plus(func):
+    @wraps(func)
+    def is_owner_plus_func(update: Update, context: CallbackContext, *args, **kwargs):
+        bot = context.bot
+        user = update.effective_user
+
+        if user.id == OWNER_ID:
+            return func(update, context, *args, **kwargs)
+        elif not user:
+            pass
+        elif DEL_CMDS and " " not in update.effective_message.text:
+            try:
+                update.effective_message.delete()
+            except:
+                pass
+        else:
+            update.effective_message.reply_text(
+                "This is a restricted command."
+                " You do not have permissions to run this."
+            )
+
+    return is_owner_plus_func
 
 
 def dev_plus(func):
@@ -115,7 +138,7 @@ def dev_plus(func):
         else:
             update.effective_message.reply_text(
                 "This is a developer restricted command."
-                " You do not have permissions to run this.",
+                " You do not have permissions to run this."
             )
 
     return is_dev_plus_func
@@ -139,7 +162,7 @@ def sudo_plus(func):
                 pass
         else:
             update.effective_message.reply_text(
-                "Who dis non-admin telling me what to do? You want a punch?",
+                "Who dis non-admin telling me what to do? You want a punch?"
             )
 
     return is_sudo_plus_func
@@ -166,7 +189,7 @@ def support_plus(func):
 def whitelist_plus(func):
     @wraps(func)
     def is_whitelist_plus_func(
-        update: Update, context: CallbackContext, *args, **kwargs,
+        update: Update, context: CallbackContext, *args, **kwargs
     ):
         bot = context.bot
         user = update.effective_user
@@ -176,7 +199,7 @@ def whitelist_plus(func):
             return func(update, context, *args, **kwargs)
         else:
             update.effective_message.reply_text(
-                f"You don't have access to use this.\nVisit @{SUPPORT_CHAT}",
+                f"You don't have access to use this.\nVisit @{SUPPORT_CHAT}"
             )
 
     return is_whitelist_plus_func
@@ -200,7 +223,7 @@ def user_admin(func):
                 pass
         else:
             update.effective_message.reply_text(
-                "Who dis non-admin telling me what to do? You want a punch?",
+                "Who dis non-admin telling me what to do? You want a punch?"
             )
 
     return is_admin
@@ -209,7 +232,7 @@ def user_admin(func):
 def user_admin_no_reply(func):
     @wraps(func)
     def is_not_admin_no_reply(
-        update: Update, context: CallbackContext, *args, **kwargs,
+        update: Update, context: CallbackContext, *args, **kwargs
     ):
         bot = context.bot
         user = update.effective_user
@@ -349,7 +372,7 @@ def can_restrict(func):
             return func(update, context, *args, **kwargs)
         else:
             update.effective_message.reply_text(
-                cant_restrict, parse_mode=ParseMode.HTML,
+                cant_restrict, parse_mode=ParseMode.HTML
             )
 
     return restrict_rights
@@ -363,11 +386,11 @@ def user_can_ban(func):
         member = update.effective_chat.get_member(user)
         if (
             not (member.can_restrict_members or member.status == "creator")
-            and user not in DRAGONS
+            and user not in SUDO_USERS
             and user not in [777000, 1087968824]
         ):
             update.effective_message.reply_text(
-                "Sorry son, but you're not worthy to wield the banhammer.",
+                "Sorry son, but you're not worthy to wield the banhammer."
             )
             return ""
         return func(update, context, *args, **kwargs)
@@ -393,7 +416,7 @@ def connection_status(func):
         else:
             if update.effective_message.chat.type == "private":
                 update.effective_message.reply_text(
-                    "Send /connect in a group that you and I have in common first.",
+                    "Send /connect in a group that you and I have in common first."
                 )
                 return connected_status
 
